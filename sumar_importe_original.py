@@ -16,24 +16,20 @@ def convertir_importe(importe_texto):
     
     texto = str(importe_texto).replace('$', '').replace(' ', '').strip()
     
-    last_dot = texto.rfind('.')
-    if last_dot != -1:
-        antes_punto = texto[:last_dot]
-        despues_punto = texto[last_dot:]
-        antes_punto = antes_punto.replace(',', '')
-        texto = antes_punto + despues_punto
-    else:
-        texto = texto.replace(',', '')
+    # Quitar puntos miles
+    texto = texto.replace('.', '')
+    # Cambiar coma decimal por punto
+    texto = texto.replace(',', '.')
     
     print(f"Importe original texto bruto: '{importe_texto}' -> texto limpio: '{texto}'")
     
     try:
         valor = float(texto)
-        # Dividir por 100 porque los últimos 2 dígitos son centavos pegados
-        return valor / 100
+        return valor
     except ValueError:
         print(f"Error al convertir a float: '{texto}'")
         return None
+
 
 
 # Paso 1: Encontrar índices de filas que son encabezados
