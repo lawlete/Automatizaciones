@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Entornos virtuales
+venv/
+env/
+.venv/
+ENV/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db

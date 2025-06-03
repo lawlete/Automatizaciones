@@ -1,22 +1,16 @@
-# Nombre del script: Extra_de_PDF_4.py
-# Descripción: Extrae la línea anterior a "TOTAL MENSUAL RETENCION IMPUESTO LEY 25.413"
-# y separa texto de número, formateando el número para Excel.
-# Autor: Alfredo
-# Fecha: 2025-06-03
-
 import os
 import pdfplumber
 import pandas as pd
 import re
 import config
 
-# Carpeta de PDFs
-print(pdf_folder := config.pdf_folder)
+# Usar las variables desde config.py
+pdf_folder = getattr(config, 'pdf_folder', '.')
+keywords = getattr(config, 'keywords_Ley_25413', [])
 
-# Palabra clave
-keywords = config.keywords_Ley_25413
+print(f"Carpeta de PDFs: {pdf_folder}")
+print(f"Palabras clave para búsqueda: {keywords}")
 
-# Lista para los resultados
 extracted_data = []
 
 def extract_previous_line_with_number(pdf_path):
@@ -29,18 +23,17 @@ def extract_previous_line_with_number(pdf_path):
             prev_line = ""
             for line in lines:
                 for keyword in keywords:
-                    if "DEBITO" in keyword:
+                    if "DEBITO" in keyword.upper():
                         clave = "DEBITO"
                     else:
-                        clave = "CREDITO" 
-                    # Verificamos si la línea contiene la keyword
+                        clave = "CREDITO"
                     if keyword in line:
-                        # Guardamos la línea anterior a la que contiene la keyword
-                        extracted_data.append({'Archivo PDF': os.path.basename(pdf_path), 
-                                            'Texto Extraído': prev_line,
-                                            'Movimiento': clave})
+                        extracted_data.append({
+                            'Archivo PDF': os.path.basename(pdf_path),
+                            'Texto Extraído': prev_line,
+                            'Movimiento': clave
+                        })
                 prev_line = line
-
 
 def procesar_linea(texto):
     match = re.search(r'(-?\d{1,3}(?:\.\d{3})*,\d{2})', texto)
@@ -52,28 +45,23 @@ def procesar_linea(texto):
     else:
         return pd.Series([texto.strip(), None])
 
-# Procesar texto para separar descripción y número
 print("Procesando líneas para extraer descripción y número...")
-# Recorremos los PDFs
+
 for archivo in os.listdir(pdf_folder):
     if archivo.lower().endswith(".pdf"):
         extract_previous_line_with_number(os.path.join(pdf_folder, archivo))
 
-# Crear DataFrame
 df = pd.DataFrame(extracted_data)
 
-# Separar en descripción y número
-df[['Descripción', 'Importe']] = df['Texto Extraído'].apply(procesar_linea)
+if not df.empty:
+    df[['Descripción', 'Importe']] = df['Texto Extraído'].apply(procesar_linea)
 
 print(f"Se encontraron {len(df)} líneas con las palabras clave '{keywords}'.")
 print(df)
 
-
-# Exportar a Excel
 output_path = os.path.join(pdf_folder, "retenciones_mensuales_25413.xlsx")
 df.to_excel(output_path, index=False)
 
 print(f"Se procesaron {len(df)} registros y se guardaron en:")
 print(output_path)
 print("Proceso completado.")
-# Fin del script Extra_de_PDF_4.py
