@@ -27,6 +27,16 @@ node_modules/
 dist/
 build/
 """)
+            
+def checkout_or_create_branch(branch_name, cwd):
+    result = subprocess.run(["git", "rev-parse", "--verify", branch_name],
+                            cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if result.returncode == 0:
+        run_command(["git", "checkout", branch_name], cwd=cwd)
+    else:
+        run_command(["git", "checkout", "-b", branch_name], cwd=cwd)
+
+
 
 def main():
     if len(sys.argv) != 3:
@@ -53,7 +63,10 @@ def main():
             run_command(["git", "commit", "-m", f"Initial commit for {subfolder}"], cwd=subfolder_path)
 
             # Crear rama con el nombre de la subcarpeta
-            run_command(["git", "checkout", "-b", subfolder], cwd=subfolder_path)
+            #run_command(["git", "checkout", "-b", subfolder], cwd=subfolder_path)
+            branch_name = subfolder  # nombre de la subcarpeta, usado como nombre de la rama
+            checkout_or_create_branch(branch_name, cwd=subfolder_path)
+
 
             # Conectar al repo remoto (con nombre 'origin')
             run_command(["git", "remote", "remove", "origin"], cwd=subfolder_path)  # Por si ya existía
