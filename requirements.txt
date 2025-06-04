@@ -1,0 +1,1 @@
+# Este script no requiere paquetes externos (solo módulos estándar de Python)
