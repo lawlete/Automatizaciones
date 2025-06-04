@@ -76,7 +76,7 @@ def main():
             run_command(["git", "remote", "add", "origin", remote_repo], cwd=subfolder_path)
 
             # Hacer push a la rama (descomentá esta línea si querés que haga push automático)
-            # run_command(["git", "push", "-u", "origin", branch_name], cwd=subfolder_path)
+            run_command(["git", "push", "-u", "origin", branch_name], cwd=subfolder_path)
 
             print(f"✅ Preparado repo en rama '{branch_name}' para {subfolder}\n")
 
